@@ -1,0 +1,168 @@
+.draw {
+    background-image: url("../image/map.png");
+    background-repeat: no-repeat;
+    height: calc(100vh);
+}
+
+.point {
+    position: absolute;
+    z-index: 9;
+    background-color: transparent;
+    text-align: center;
+    border: 1px solid red;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    opacity: 1;
+    cursor: pointer;
+}
+
+.border {
+    z-index: 9;
+    background-color: red;
+    text-align: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    opacity: 1;
+}
+
+#point-start.point {
+    border-color: blue;
+    background-color: blue;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    opacity: 1;
+
+}
+
+#point-start.point .border {
+    background-color: blue;
+    width: 20px;
+    height: 20px;
+    opacity: 1;
+}
+
+.point.ran {
+    opacity: 1;
+}
+
+.point.ran .border {
+    opacity: 1;
+}
+
+.point.hided {
+    opacity: 0;
+
+}
+
+.point.hided .border {
+    opacity: 0;
+}
+
+.row {
+    margin: 0;
+    width: 100%;
+}
+
+.row h1 {
+    color: red;
+}
+
+.div-margin-top {
+    margin-top: 10px;
+}
+
+.div-margin-top button {
+    margin-right: 10px;
+}
+
+tbody {
+    display: block;
+    max-height: 500px;
+    overflow: auto;
+}
+
+thead, tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed; /* even columns width , fix width of table too*/
+}
+
+thead {
+    width: calc(100% - 2.65%) /* scrollbar is average 1em/16px width, remove it from thead width */
+}
+
+table {
+    width: 100%;
+}
+
+.materialpicker-colors {
+    -webkit-user-select: none;
+    user-select: none;
+    position: relative;
+    border: 1px solid #FFF;
+    border-radius: 2px;
+    display: inline-block;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+    cursor: default;
+}
+
+.materialpicker-colors div.selected {
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 0 4px #000;
+    border: 2px solid #FFF;
+}
+
+div.materialpicker-white.selected {
+    border-color: #78909C;
+}
+
+.colorpicker-preview {
+    width: 40px;
+    height: 40px;
+    border-radius: 2px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.materialpicker.ng-invalid .materialpicker-colors {
+    border-color: #a94442;
+    box-shadow: 0 1px 5px #a94442;
+}
+
+.colorpicker-input {
+    height: auto;
+    width: 100px;
+}
+
+.progress .sr-only {
+    position: relative;
+    width: auto;
+    height: auto;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0);
+        opacity: 0.0;
+    }
+    25% {
+        transform: scale(0);
+        opacity: 0.1;
+    }
+    50% {
+        transform: scale(0.3);
+        opacity: 0.5;
+    }
+    75% {
+        transform: scale(0.5);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.1;
+    }
+}
