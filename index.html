@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Draw runway - Duy Hung</title>
+    <link rel="stylesheet" href="css/lumen/bootstrap.min.css">
+    <link rel="stylesheet" href="css/color-picker.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body ng-app="app" ng-controller="drawController">
+<shortcut></shortcut>
+<div class="row">
+    <div class="draw col-md-8" ng-style="{'background-image': 'url('+daw_bgimage+')'}">
+        <div class="point" ng-repeat="item in points" id="point-{{item.index}}"
+             ng-class="{'ran': item.ran, 'hided': item.hided}"
+             ng-style="{'background-color':((item.index == 'start')?element.real.start_color:element.real.other_color), 'border-color':((item.index == 'start')?element.real.start_color:element.real.other_color)}"
+        >
+            <div class="border"
+                 ng-style="{'background-color':((item.index == 'start')?element.real.start_color:element.real.other_color)}"></div>
+        </div>
+    </div>
+    <div class="control col-md-4">
+        <div class="row div-margin-top">
+            <button type="button" class="btn btn-primary" ng-click="addStartPoint()" ng-show="!createStarted">Add start
+                point
+            </button>
+            <button type="button" class="btn btn-primary" ng-click="addPoint()">Add point</button>
+            <button type="button" class="btn btn-primary" ng-click="save()">Save</button>
+        </div>
+        <div class="row div-margin-top">
+            <button type="button" class="btn btn-success" ng-click="getSimpleData()">Simple data</button>
+        </div>
+        <div class="row div-margin-top" ng-show="points.length != 0">
+            <button type="button" class="btn btn-success" ng-click="run()">Run</button>
+            <button type="button" class="btn btn-danger" ng-click="stop()"
+                    ng-show="(started && counter!=points.length)">Stop
+            </button>
+            <button type="button" class="btn btn-warning" ng-click="reset()">Reset</button>
+            <button type="button" class="btn btn-warning" ng-click="clearAll()">Clear</button>
+            <button type="button" class="btn btn-warning" ng-click="hideAll()">Hide all</button>
+            <button type="button" class="btn btn-warning" ng-click="showAll()">Show all</button>
+        </div>
+        <div class="row div-margin-top" ng-show="started && points.length != 0">
+            <div class="progress" style="width: 100%">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                     aria-valuenow="{{counter*100/points.length}}" aria-valuemin="0" aria-valuemax="100"
+                     ng-style="{'width': (counter*100/points.length + '%')}">
+                    <span class="sr-only">{{counter*100/points.length | number}}% Complete ({{counter}}/{{points.length}})</span>
+                </div>
+            </div>
+        </div>
+        <div class="row div-margin-top" ng-init="showTab = 0">
+            <button type="button" class="btn btn-info" ng-click="(showTab == 1)?(showTab = 0):(showTab = 1)">Setting
+            </button>
+            <button type="button" class="btn btn-info" ng-click="(showTab == 2)?(showTab = 0):(showTab = 2)">Table
+            </button>
+            <button style="display: none" type="button" class="btn btn-info"
+                    ng-click="(showTab == 3)?(showTab = 0):(showTab = 3)">Add text
+            </button>
+        </div>
+        <div class="row div-margin-top" ng-show="showTab == 1">
+            <div class="form-group">
+                <label for="timeDelay">Time delay run</label>
+                <input type="text" class="form-control" id="timeDelay" ng-model="timeDelay">
+                <small class="form-text text-muted">Time delay(ms) when run.</small>
+            </div>
+            <div class="form-group">
+                <label for="timeDelaylAdd">Time delay add loop</label>
+                <input type="text" class="form-control" id="timeDelaylAdd" ng-model="timeDelaylAdd">
+                <small class="form-text text-muted">Time delay(ms) when run loop add.</small>
+            </div>
+            <div class="form-group">
+                <label for="backgroup-image">Upload image</label>
+                <input type="file" ng-file-select="onFileSelect($files)" class="form-control-file" id="backgroup-image"
+                       aria-describedby="fileHelp">
+                <b>Preview:</b><br/>
+                <i ng-hide="imageSrc">No image choosed</i>
+                <img ng-hide="!imageSrc" ng-src="{{imageSrc}}" style="width: 40px;height: 40px"/><br/>
+                <button class="btn btn-success" ng-click="setBackground()">Apply</button>
+            </div>
+        </div>
+        <div class="row div-margin-top" ng-show="showTab == 1">
+            <div class="col-md-12 row">
+                <div class="col-md-8">
+                    <material-picker ng-model="color" format="'hex'" hover-model="hoverColor"
+                                     size="size"></material-picker>
+                    <div class="d-md-inline-flex div-margin-top">
+                        <div class="colorpicker-preview" ng-style="{background: color}"></div>
+                        <input ng-model="color" class="form-control colorpicker-input"/>
+                        <button class="btn btn-default" ng-click="size=15">Size: 15</button>
+                        <button class="btn btn-default" ng-click="size=10">Size: 10</button>
+                    </div>
+                    <div ng-show="hoverColor !== null">
+                        Hex: {{hoverColor.hex}} | Name: {{hoverColor.name}} | R: {{hoverColor.r}} G: {{hoverColor.g}} B:
+                        {{hoverColor.b}}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <fieldset class="form-group">
+                        <table>
+                            <tr>
+                                <td style="width: 70%">
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input type="radio" class="form-check-input" name="selectElement"
+                                                   ng-model="selectElement" value="start" checked="">
+                                            Start point
+                                        </label>
+                                    </div>
+                                </td>
+                                <td id="selectColorStart">
+                                    <div class="point" style="position: relative" id="point-start"
+                                         ng-style="{'background-color':element.option.start_color, 'border-color':element.option.start_color}">
+                                        <div class="border"
+                                             ng-style="{'background-color':element.option.start_color}"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 70%">
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input type="radio" class="form-check-input" name="selectElement"
+                                                   ng-model="selectElement" value="other">
+                                            Other point
+                                        </label>
+                                    </div>
+                                </td>
+                                <td id="selectColorOther">
+                                    <div class="point" style="position: relative;"
+                                         ng-style="{'background-color':element.option.other_color, 'border-color':element.option.other_color}">
+                                        <div class="border"
+                                             ng-style="{'background-color':element.option.other_color}"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                    <button class="btn btn-primary" ng-click="setColor()">Apply</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row div-margin-top" ng-show="showTab == 2">
+            <p>Total point: {{points.length}}</p>
+            <table class="table table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Point</th>
+                    <th scope="col">ran</th>
+                    <th scope="col">Before run</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="table-active" ng-show="points.length == 0">
+                    <td colspan="4">No data in table</td>
+                </tr>
+                <tr ng-repeat="item in points">
+                    <td>{{item.index}}</td>
+                    <td><span class="badge badge-success" ng-show="item.ran">Ran</span><span class="badge badge-dark"
+                                                                                             ng-show="!item.ran">False</span>
+                    </td>
+                    <td><span class="badge badge-success" ng-show="item.hided">Hided</span><span
+                            class="badge badge-danger"
+                            ng-show="!item.hided">Show</span>
+                    </td>
+                    <td><a href="javascript:void(0)" ng-click="removePoint($index, points)">Remove</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="display: none" class="row div-margin-top" ng-show="showTab == 3">
+            <div class="row">
+                <div class="col-md-5">
+                    <input type="text" class="form-control" ng-model="newText.text">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" ng-model="newText.fontSize">
+                </div>
+                <div class="col-md-3">
+                    <input color-picker color-picker-position="left" color-picker-model="newText.color"
+                           class="form-control" ng-style="{'background-color': newText.color}"/>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-success" ng-click="addText()">Add</button>
+                </div>
+            </div>
+            <div class="row" ng-repeat="text in listText">
+                <div class="col-md-5">
+                    <input type="text" class="form-control" ng-model="text.text">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" ng-model="text.fontSize">
+                </div>
+                <div class="col-md-3">
+                    <input color-picker color-picker-position="left" color-picker-model="text.color"
+                           class="form-control" ng-style="{'background-color': text.color}"/>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-danger">Remove</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script src="js/main.js"></script>
+<script src="js/jquery-2.1.4.js"></script>
+
+<script src="js/angular/angular.js"></script>
+<script src="js/ui.bootstrap.materialPicker.js"></script>
+<script src="js/color-picker.min.js"></script>
+
+
+<script src="js/app.js"></script>
+<script src="js/drawController.js"></script>
+</body>
+</html>
