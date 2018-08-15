@@ -1,0 +1,70 @@
+<div class="row mr-0 ml-0 justify-content-between mb-3">
+    <div class="col-4">
+        <form class="form-inline">
+            <div class="form-group">
+                <label for="search">Search</label>
+                <input type="text" name="search" class="form-control ml-1" placeholder="Search" ng-model="currentTable.field_search">
+            </div>
+        </form>
+    </div>
+    <div class="col-8 row justify-content-end row-eq-height">
+        <div class="col-4 border-right border-secondary d-flex align-items-center justify-content-end">
+            <span>Page</span>
+            <ul class="pagination pagination-sm m-0 mr-1 ml-1">
+                <li class="page-item">
+                    <a class="page-link" href="javascript:void(0)" ng-click="(currentTable.current_page > 1)?(currentTable.current_page = currentTable.current_page-1):1">«</a>
+                </li>
+                <li class="page-item active">
+                    <input type="text" class="form-control rounded-0" style="height: 30px;width: 70px;" ng-model="currentTable.current_page">
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="javascript:void(0)" ng-click="(currentTable.current_page < total_length)?(currentTable.current_page = currentTable.current_page+1):1">»</a>
+                </li>
+            </ul>
+            <span> of {{total_length = (Math.floor(currentTable.total_records.length/currentTable.page_size) == 0)?(Math.floor(currentTable.total_records.length/currentTable.page_size)):(Math.floor(currentTable.total_records.length/currentTable.page_size)+1)}} pages</span>
+        </div>
+        <div class="col-3 border-right border-secondary d-flex align-items-center justify-content-center">
+            <span>View</span>
+            <select class="form-control w-50 mr-1 ml-1" ng-model="currentTable.page_size" convert-to-number>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            <span>per page</span>
+        </div>
+        <div class="col-3 d-flex align-items-center justify-content-center">
+            Total {{currentTable.total_records.length}} records found
+        </div>
+    </div>
+</div>
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Address</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Debt</th>
+            <th scope="col" width="10%">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="customer in currentTable.total_records = (customers | filter: currentTable.field_search) | startFrom : ((currentTable.current_page-1)*currentTable.page_size) | limitTo:currentTable.page_size">
+            <td>{{customer.id}}</td>
+            <td>{{customer.name}}</td>
+            <td>{{customer.address}}</td>
+            <td>{{customer.phone}}</td>
+            <td>{{customer.total_debt}}</td>
+            <td>
+                <div class="row justify-content-center">
+                    <i class="fas fa-edit mr-4" ng-click="editCustomer(customer.id)"></i>
+                    <i class="fas fa-trash" ng-click="deleteCustomer(customer.id)"></i>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td ng-show="!currentTable.total_records.length" colspan="6">No data in table</td>
+        </tr>
+    </tbody>
+</table>
